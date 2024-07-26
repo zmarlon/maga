@@ -1,5 +1,4 @@
 use crate::lexer::{Token, Tokens};
-use std::cmp::PartialEq;
 use std::ops::{Deref, DerefMut};
 
 #[derive(Debug)]
@@ -56,32 +55,13 @@ impl FromTokenStream for Function {
     fn from_token_stream(tokens: &mut Tokens) -> Result<Self, CompileError> {
         tokens.add_pos(1);
 
-        let mut name = String::default();
         let mut return_type = "()".to_string();
 
         //Parse ident
-        match tokens.get() {
-            Token::Identifier(ident) => {
-                name = ident.clone();
-            }
-            token => {
-                return Err(CompileError::new(format!(
-                    "Expected identifier, found {:?} instead",
-                    token
-                )));
-            }
-        }
+        let name = tokens.get().as_ident()?.to_owned();
 
         //Expect lparen
-        match tokens.get() {
-            Token::LParen => {}
-            token => {
-                return Err(CompileError::new(format!(
-                    "Expected LParen, found {:?} instead",
-                    token
-                )));
-            }
-        }
+        tokens.get().as_lparen()?.to_owned();
 
         //Expect parameter list
         match tokens.get() {
@@ -93,35 +73,14 @@ impl FromTokenStream for Function {
         //Parse optional return type
         if *tokens.peek() == Token::DoubleColon {
             tokens.add_pos(1);
-            match tokens.get() {
-                Token::Identifier(ident) => {
-                    return_type = ident.clone();
-                }
-                token => {
-                    return Err(CompileError::new(format!(
-                        "Expected return type, found {:?} instead",
-                        token
-                    )));
-                }
-            }
+            return_type = tokens.get().as_ident()?.to_owned();
         }
 
-        match tokens.get() {
-            Token::LBrace => {
-                //TODO: parse function scope
-            }
-            token => {
-                return Err(CompileError::new(format!(
-                    "Expected  function scope, found {:?} instead",
-                    token
-                )));
-            }
-        }
+        tokens.get().as_lbrace()?;
 
-        match tokens.get() {
-            Token::RBrace => {}
-            _ => {}
-        }
+        //TODO: handle inner
+
+        tokens.get().as_rbrace()?;
 
         Ok(Self {
             name,
@@ -143,7 +102,16 @@ impl FromTokenStream for FunctionParam {
     where
         Self: Sized,
     {
-        todo!()
+        let name = tokens.get().as_ident()?.to_owned();
+        tokens.get().as_double_colon()?;
+
+        let mut r#type = tokens.get().as_ident()?.to_owned();
+
+        if *tokens.try_peek()? == Token::Comma {
+            tokens.add_pos(1);
+        }
+
+        Ok(Self { name, r#type })
     }
 }
 

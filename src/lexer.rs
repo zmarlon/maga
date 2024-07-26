@@ -1,3 +1,4 @@
+use crate::parser::CompileError;
 use logos::Logos;
 
 #[derive(Logos, Clone, Debug, PartialEq, Eq)]
@@ -76,6 +77,39 @@ pub enum Token {
     Identifier(String),
 }
 
+macro_rules! generate_as_fn {
+    ($fn_name:ident, $variant:path) => {
+        pub fn $fn_name(&self) -> Result<(), CompileError> {
+            match self {
+                $variant => Ok(()),
+                token => Err(CompileError::new(format!(
+                    "Expected {}, found {:?}",
+                    stringify!($variant),
+                    token
+                ))),
+            }
+        }
+    };
+}
+
+impl Token {
+    pub fn as_ident(&self) -> Result<&str, CompileError> {
+        match self {
+            Token::Identifier(ident) => Ok(ident.as_str()),
+            token => Err(CompileError::new(format!(
+                "Expected ident, found {:?}",
+                token
+            ))),
+        }
+    }
+
+    generate_as_fn!(as_lparen, Token::LParen);
+    generate_as_fn!(as_rparen, Token::RParen);
+    generate_as_fn!(as_lbrace, Token::LBrace);
+    generate_as_fn!(as_rbrace, Token::RBrace);
+    generate_as_fn!(as_double_colon, Token::DoubleColon);
+}
+
 pub struct Lexer<'a> {
     lexer: logos::Lexer<'a, Token>,
 }
@@ -117,6 +151,16 @@ impl Tokens {
 
     pub fn peek(&self) -> &Token {
         &self.tokens[self.pos]
+    }
+
+    pub fn try_peek(&self) -> Result<&Token, CompileError> {
+        if self.has_more() {
+            Ok(self.peek())
+        } else {
+            Err(CompileError::new(
+                "No more elements available in token stream".to_owned(),
+            ))
+        }
     }
 
     pub fn has_more(&self) -> bool {
