@@ -1,3 +1,4 @@
+use crate::parser::scope::Scope;
 use crate::parser::*;
 
 #[derive(Debug)]
@@ -7,7 +8,7 @@ pub struct Function {
 
     pub params: Vec<FunctionParam>,
 
-    pub body: Vec<Element>,
+    pub body: Option<Scope>,
 }
 
 impl FromTokenStream for Function {
@@ -36,17 +37,18 @@ impl FromTokenStream for Function {
             return_type = Type::from_token_stream(tokens)?;
         }
 
-        tokens.get().as_lbrace()?;
+        let mut body = None;
 
-        //TODO: handle inner
-
-        tokens.get().as_rbrace()?;
+        //We check if function has body
+        if *tokens.peek() == Token::LBrace {
+            body = Some(Scope::from_token_stream(tokens)?);
+        }
 
         Ok(Self {
             name,
             return_type,
             params,
-            body: vec![],
+            body,
         })
     }
 }

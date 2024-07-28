@@ -1,7 +1,7 @@
 use crate::generation::type_registry::TypeRegistry;
 use crate::generation::{CodeGenError, Context, Module};
 use crate::parser::Function;
-use llvm_sys::core::{LLVMAddFunction, LLVMFunctionType};
+use llvm_sys::core::{LLVMAddFunction, LLVMAppendBasicBlockInContext, LLVMFunctionType};
 use llvm_sys::prelude::LLVMTypeRef;
 use std::ffi::CString;
 
@@ -14,7 +14,14 @@ pub fn generate_function(
     let function_type = make_function_type(type_registry, function)?;
     let name = CString::new(function.name.as_str())?;
 
-    unsafe { LLVMAddFunction(**module, name.as_ptr(), function_type) };
+    let llvm_fn = unsafe { LLVMAddFunction(**module, name.as_ptr(), function_type) };
+
+    let Some(body) = &function.body else {
+        return Ok(());
+    };
+
+    let entry =
+        unsafe { LLVMAppendBasicBlockInContext(**context, llvm_fn, b"entry\0".as_ptr().cast()) };
 
     Ok(())
 }

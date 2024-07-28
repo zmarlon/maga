@@ -1,3 +1,6 @@
-fun doSth(a: u32, b: *u64 ): u32 {}
-fun puts(content: *u8) {}
-fun add(a: u32, b: *f64, content: *u8, x: f32): *u8 {}
+fun memcpy(dst: *u8, src: *u8, size: u64)
+
+fun myFunction(a: u32) {
+    let a = 30 + 5 + myVariable;
+    let b = a + 3 * 5;
+}

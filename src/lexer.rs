@@ -38,6 +38,8 @@ pub enum Token {
     #[token(",")]
     Comma,
 
+    #[token("=")]
+    Assign,
     #[token("+")]
     Add,
     #[token("+=")]
@@ -73,8 +75,23 @@ pub enum Token {
     #[token("]")]
     RBracket,
 
-    #[regex("[a-zA-Z0-9]+", |lex| lex.slice().to_owned())]
+    #[token("<")]
+    Less,
+    #[token("<=")]
+    LessEqual,
+    #[token(">")]
+    Greater,
+    #[token(">=")]
+    GreaterEqual,
+
+    #[regex("[a-zA-Z_][a-zA-Z0-9_]*", |lex| lex.slice().to_owned())]
     Identifier(String),
+
+    #[regex("-(0|[1-9][0-9]*)", |lex| lex.slice().parse::<i64>().unwrap())]
+    IntLiteral(i64),
+
+    #[regex("(0|[1-9][0-9]*)", |lex| lex.slice().parse::<u64>().unwrap())]
+    UIntLiteral(u64),
 }
 
 macro_rules! generate_as_fn {
@@ -108,6 +125,9 @@ impl Token {
     generate_as_fn!(as_lbrace, Token::LBrace);
     generate_as_fn!(as_rbrace, Token::RBrace);
     generate_as_fn!(as_double_colon, Token::DoubleColon);
+    generate_as_fn!(as_comma, Token::Comma);
+    generate_as_fn!(as_assign, Token::Assign);
+    generate_as_fn!(as_semicolon, Token::Semicolon);
 }
 
 pub struct Lexer<'a> {

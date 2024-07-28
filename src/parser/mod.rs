@@ -1,8 +1,14 @@
 use crate::lexer::{Token, Tokens};
 use std::ops::{Deref, DerefMut};
 
+mod declaration;
+mod expression;
 mod function;
+mod scope;
 mod r#type;
+
+use crate::parser::declaration::Declaration;
+use crate::parser::expression::Expression;
 pub use function::*;
 pub use r#type::*;
 
@@ -27,6 +33,7 @@ pub trait FromTokenStream {
 pub enum Element {
     SourceFile(Vec<Element>),
     Function(Function),
+    Declaration(Declaration),
 }
 
 #[derive(Debug, Default)]
@@ -82,4 +89,10 @@ impl Parser {
     pub fn root(&self) -> &SourceFile {
         &self.root
     }
+}
+
+#[derive(Debug)]
+pub enum LiteralType {
+    UInt(u64),
+    Int(i64),
 }

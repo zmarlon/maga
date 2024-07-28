@@ -91,8 +91,7 @@ impl CompileContext {
         for element in &source_file.0 {
             match element {
                 Element::Function(function) => {
-                    generate_function(&self.context, &self.type_registry, module, function)
-                        .unwrap(); //TODO:
+                    generate_function(&self.context, &self.type_registry, module, function)?;
                 }
                 _ => {}
             }
