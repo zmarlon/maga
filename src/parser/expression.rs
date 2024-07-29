@@ -87,7 +87,7 @@ pub struct UnaryExpression {
 
 #[derive(Debug)]
 pub struct ConstantExpression {
-    value: ConstantExpressionValue,
+    pub value: ConstantExpressionValue,
 }
 
 #[derive(Debug)]
@@ -118,7 +118,7 @@ impl FromTokenStream for ConstantExpression {
 
 #[derive(Debug)]
 pub struct VariableExpression {
-    name: String,
+    pub name: String,
 }
 
 #[derive(Debug)]
@@ -174,7 +174,7 @@ impl Expression {
             Token::UIntLiteral(_) | Token::IntLiteral(_) => Self::parse_constant(tokens),
             Token::LParen => Self::parse_paren(tokens),
             token => Err(CompileError::new(format!(
-                "Expected expression, found {:?}",
+                "Expected expressions, found {:?}",
                 token
             ))),
         }

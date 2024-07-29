@@ -1,16 +1,19 @@
 use crate::lexer::{Token, Tokens};
 use std::ops::{Deref, DerefMut};
 
-mod declaration;
+mod assignment;
 mod expression;
 mod function;
 mod scope;
+mod statement;
 mod r#type;
 
-use crate::parser::declaration::Declaration;
-use crate::parser::expression::Expression;
+pub use assignment::*;
+pub use expression::*;
 pub use function::*;
 pub use r#type::*;
+pub use scope::*;
+pub use statement::Statement;
 
 #[derive(Debug)]
 pub struct CompileError {
@@ -33,7 +36,7 @@ pub trait FromTokenStream {
 pub enum Element {
     SourceFile(Vec<Element>),
     Function(Function),
-    Declaration(Declaration),
+    Statement(Statement),
 }
 
 #[derive(Debug, Default)]

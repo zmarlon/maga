@@ -1,4 +1,4 @@
-use crate::generation::{CompileContext, Context, Module};
+use crate::generation::{CodeGenContext, Context, Module};
 use crate::lexer::Lexer;
 use crate::parser::Parser;
 use std::fs;
@@ -19,7 +19,7 @@ fn main() {
 
     println!("\n\n\n");
 
-    let mut context = CompileContext::new().unwrap();
+    let mut context = CodeGenContext::new().unwrap();
     let mut module = context.context_mut().create_module("example").unwrap();
     context.generate(&mut module, &parser).unwrap();
 }

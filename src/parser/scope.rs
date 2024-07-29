@@ -1,11 +1,10 @@
 use crate::lexer::{Token, Tokens};
-use crate::parser::declaration::Declaration;
-use crate::parser::expression::Expression;
+use crate::parser::statement::Statement;
 use crate::parser::{CompileError, Element, FromTokenStream};
 
 #[derive(Debug)]
 pub struct Scope {
-    elements: Vec<Element>,
+    pub elements: Vec<Statement>,
 }
 
 impl FromTokenStream for Scope {
@@ -18,11 +17,8 @@ impl FromTokenStream for Scope {
         let mut elements = Vec::new();
 
         while tokens.has_more() && *tokens.peek() != Token::RBrace {
-            if *tokens.peek() == Token::Var || *tokens.peek() == Token::Let {
-                elements.push(Element::Declaration(Declaration::from_token_stream(
-                    tokens,
-                )?))
-            }
+            //We parse assignment
+            elements.push(Statement::from_token_stream(tokens)?);
         }
 
         while *tokens.peek() != Token::RBrace {

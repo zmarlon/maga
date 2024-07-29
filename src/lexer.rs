@@ -128,6 +128,7 @@ impl Token {
     generate_as_fn!(as_comma, Token::Comma);
     generate_as_fn!(as_assign, Token::Assign);
     generate_as_fn!(as_semicolon, Token::Semicolon);
+    generate_as_fn!(as_return, Token::Return);
 }
 
 pub struct Lexer<'a> {

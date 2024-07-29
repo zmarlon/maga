@@ -3,13 +3,13 @@ use crate::parser::expression::Expression;
 use crate::parser::{CompileError, FromTokenStream, LiteralType};
 
 #[derive(Debug)]
-pub struct Declaration {
-    mutable: bool,
-    ident: String,
-    rhs: Expression,
+pub struct AssignmentStatement {
+    pub mutable: bool,
+    pub ident: String,
+    pub rhs: Expression,
 }
 
-impl FromTokenStream for Declaration {
+impl FromTokenStream for AssignmentStatement {
     fn from_token_stream(tokens: &mut Tokens) -> Result<Self, CompileError>
     where
         Self: Sized,

@@ -1,11 +1,16 @@
+mod expressions;
 mod function;
+mod statement;
+mod statements;
 mod type_registry;
 
+use crate::generation::expressions::CodeGenExpr;
 use crate::generation::function::generate_function;
 use crate::generation::type_registry::TypeRegistry;
 use crate::parser::{Element, Parser};
 use llvm_sys::core::{LLVMContextCreate, LLVMDumpModule, LLVMModuleCreateWithNameInContext};
 use llvm_sys::prelude::*;
+use std::collections::HashMap;
 use std::ffi::{CString, NulError};
 use std::ops::Deref;
 use thiserror::Error;
@@ -32,6 +37,9 @@ pub enum CodeGenError {
 
     #[error("Invalid type: {0}")]
     InvalidType(String),
+
+    #[error("Invalid variable: {0}")]
+    InvalidVariable(String),
 }
 
 impl Context {
@@ -69,12 +77,14 @@ impl Deref for Module {
     }
 }
 
-pub struct CompileContext {
+pub struct CodeGenContext {
     context: Context,
     type_registry: TypeRegistry,
+    variables: HashMap<String, CodeGenExpr>,
+    variable_scopes: HashMap<u32, Vec<String>>,
 }
 
-impl CompileContext {
+impl CodeGenContext {
     pub fn new() -> Result<Self, CodeGenError> {
         let context = Context::new()?;
         let type_registry = TypeRegistry::new(&context);
@@ -82,6 +92,8 @@ impl CompileContext {
         Ok(Self {
             context,
             type_registry,
+            variables: HashMap::new(),
+            variable_scopes: HashMap::new(),
         })
     }
 
