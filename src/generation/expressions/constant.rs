@@ -1,21 +1,15 @@
-use crate::generation::expressions::{CodeGenExpr, ExpressionCodeGen};
+use crate::generation::expressions::{CodeGenExpr, ExpressionCodeGen, ExpressionCodeGenParams};
 use crate::generation::{CodeGenContext, CodeGenError, Module};
 use crate::parser::{ConstantExpression, ConstantExpressionValue, Function, Type};
 use llvm_sys::core::LLVMConstInt;
-use llvm_sys::LLVMBasicBlock;
 
-impl ExpressionCodeGen for ConstantExpression {
-    fn generate(
-        &self,
-        context: &mut CodeGenContext,
-        module: &mut Module,
-        function: &Function,
-        block: LLVMBasicBlock,
-    ) -> Result<CodeGenExpr, CodeGenError> {
+impl<'a> ExpressionCodeGen<'a> for ConstantExpression {
+    fn generate(&self, params: &ExpressionCodeGenParams<'a>) -> Result<CodeGenExpr, CodeGenError> {
         unsafe {
             match self.value {
                 ConstantExpressionValue::Int(val) => {
-                    let ty = context
+                    let ty = params
+                        .context
                         .type_registry
                         .get(&Type {
                             is_pointer: false,
@@ -28,7 +22,8 @@ impl ExpressionCodeGen for ConstantExpression {
                     })
                 }
                 ConstantExpressionValue::UInt(val) => {
-                    let ty = context
+                    let ty = params
+                        .context
                         .type_registry
                         .get(&Type {
                             is_pointer: false,

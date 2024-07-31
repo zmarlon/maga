@@ -3,10 +3,11 @@ mod function;
 mod statement;
 mod statements;
 mod type_registry;
+mod util;
 
 use crate::generation::expressions::CodeGenExpr;
 use crate::generation::function::generate_function;
-use crate::generation::type_registry::TypeRegistry;
+use crate::generation::type_registry::{TypeDef, TypeRegistry};
 use crate::parser::{Element, Parser};
 use llvm_sys::core::{LLVMContextCreate, LLVMDumpModule, LLVMModuleCreateWithNameInContext};
 use llvm_sys::prelude::*;
@@ -40,6 +41,12 @@ pub enum CodeGenError {
 
     #[error("Invalid variable: {0}")]
     InvalidVariable(String),
+
+    #[error("Uunsupported operator")]
+    UnsupportedOperator,
+
+    #[error("Types are not eual: lhs: {0:?}, rhs: {1:?}")]
+    TypesNotEqual(TypeDef, TypeDef),
 }
 
 impl Context {

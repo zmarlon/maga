@@ -1,19 +1,14 @@
-use crate::generation::expressions::{CodeGenExpr, ExpressionCodeGen};
-use crate::generation::{CodeGenContext, CodeGenError, Module};
-use crate::parser::{Function, VariableExpression};
-use llvm_sys::LLVMBasicBlock;
+use crate::generation::expressions::{CodeGenExpr, ExpressionCodeGen, ExpressionCodeGenParams};
+use crate::generation::CodeGenError;
+use crate::parser::VariableExpression;
 
-impl ExpressionCodeGen for VariableExpression {
-    fn generate(
-        &self,
-        context: &mut CodeGenContext,
-        module: &mut Module,
-        function: &Function,
-        block: LLVMBasicBlock,
-    ) -> Result<CodeGenExpr, CodeGenError> {
-        Ok(*context
+impl ExpressionCodeGen<'_> for VariableExpression {
+    fn generate(&self, params: &ExpressionCodeGenParams) -> Result<CodeGenExpr, CodeGenError> {
+        Ok(params
+            .context
             .variables
             .get(&self.name)
-            .ok_or(CodeGenError::InvalidVariable(self.name.clone()))?)
+            .ok_or(CodeGenError::InvalidVariable(self.name.clone()))?
+            .clone())
     }
 }

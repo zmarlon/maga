@@ -74,9 +74,9 @@ pub enum Expression {
 
 #[derive(Debug)]
 pub struct BinaryExpression {
-    operator: Operator,
-    lhs: Box<Expression>,
-    rhs: Box<Expression>,
+    pub operator: Operator,
+    pub lhs: Box<Expression>,
+    pub rhs: Box<Expression>,
 }
 
 #[derive(Debug)]
